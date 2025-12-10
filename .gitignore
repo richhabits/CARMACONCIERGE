@@ -8,6 +8,12 @@ dist/
 build/
 .next/
 out/
+*.tsbuildinfo
+*.map
+apps/mobile/**/*.js
+apps/mobile/**/*.d.ts
+!apps/mobile/babel.config.js
+next-env.d.ts
 
 # Expo
 .expo/
