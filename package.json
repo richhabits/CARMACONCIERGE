@@ -1,0 +1,30 @@
+{
+  "name": "carmaconcierge",
+  "version": "1.0.0",
+  "private": true,
+  "description": "KARMA - National vehicle management platform",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "backend:dev": "npm run dev --workspace=@carmaconcierge/backend",
+    "mobile:dev": "npm run dev --workspace=@carmaconcierge/mobile",
+    "admin:dev": "npm run dev --workspace=@carmaconcierge/admin",
+    "db:migrate": "npm run migrate --workspace=@carmaconcierge/backend",
+    "db:studio": "npm run studio --workspace=@carmaconcierge/backend",
+    "db:seed": "npm run seed --workspace=@carmaconcierge/backend"
+  },
+  "devDependencies": {
+    "turbo": "^1.11.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

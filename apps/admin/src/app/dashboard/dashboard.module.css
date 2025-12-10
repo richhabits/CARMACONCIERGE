@@ -1,0 +1,107 @@
+.container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.nav {
+  width: 250px;
+  background: #1a1a2e;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.navHeader h2 {
+  margin-bottom: 30px;
+  font-size: 20px;
+}
+
+.navLinks {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.navLink {
+  padding: 12px 15px;
+  border-radius: 6px;
+  transition: background 0.2s;
+  color: #aaa;
+}
+
+.navLink:hover {
+  background: #2a2a3e;
+  color: white;
+}
+
+.logoutButton {
+  padding: 12px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.logoutButton:hover {
+  background: #c82333;
+}
+
+.main {
+  flex: 1;
+  padding: 40px;
+}
+
+.header {
+  margin-bottom: 40px;
+}
+
+.header h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.header p {
+  color: #666;
+  font-size: 16px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card h3 {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.number {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.cardLink {
+  color: #667eea;
+  font-weight: 500;
+}
+
+.cardLink:hover {
+  text-decoration: underline;
+}
