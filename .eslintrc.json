@@ -45,7 +45,19 @@
     "import/no-unresolved": [
       "error",
       {
-        "ignore": ["^@/", "\\.css$", "\\.svg$", "\\.png$", "\\.jpg$"]
+        "ignore": [
+          "^@/",
+          "\\.css$",
+          "\\.svg$",
+          "\\.png$",
+          "\\.jpg$",
+          "\\.jpeg$",
+          "\\.gif$",
+          "\\.webp$",
+          "\\.ico$",
+          "\\.woff$",
+          "\\.woff2$"
+        ]
       }
     ]
   },

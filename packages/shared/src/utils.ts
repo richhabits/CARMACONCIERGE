@@ -7,10 +7,13 @@ export function formatRegistration(registration: string): string {
 
 /**
  * Validate UK vehicle registration format
+ * Note: This currently validates the post-2001 format (e.g., AB12 CDE).
+ * Historical formats like pre-2001 (e.g., A123 ABC) or prefix formats
+ * are not covered and should be added based on business requirements.
  */
 export function isValidRegistration(registration: string): boolean {
   const formatted = formatRegistration(registration);
-  // Basic UK registration pattern (simplified)
+  // UK registration pattern for post-2001 format
   const pattern = /^[A-Z]{2}[0-9]{2}[A-Z]{3}$/;
   return pattern.test(formatted);
 }
