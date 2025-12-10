@@ -1,0 +1,21 @@
+{
+  "name": "carmaconcierge",
+  "version": "1.0.0",
+  "private": true,
+  "description": "KARMA — National vehicle management platform",
+  "scripts": {
+    "dev": "pnpm --parallel --stream dev",
+    "build": "pnpm --recursive --stream build",
+    "clean": "pnpm --recursive --parallel exec rm -rf dist node_modules .next .expo",
+    "backend:dev": "pnpm --filter @carmaconcierge/backend dev",
+    "admin:dev": "pnpm --filter @carmaconcierge/admin dev",
+    "mobile:dev": "pnpm --filter @carmaconcierge/mobile dev"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
