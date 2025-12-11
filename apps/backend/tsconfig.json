@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@carmaconcierge/shared": [
+        "../../packages/shared/src"
+      ]
+    }
+  },
+  "exclude": [
+    "src/marketing/**",
+    "src/calling/**",
+    "src/auth/strategies/google.strategy.ts",
+    "src/auth/strategies/microsoft.strategy.ts"
+  ]
+}

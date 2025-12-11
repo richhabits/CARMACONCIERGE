@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: carmaconcierge-db
+    environment:
+      POSTGRES_USER: carmaconcierge
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_DB: carmaconcierge
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U carmaconcierge"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - carmaconcierge-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: carmaconcierge-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - carmaconcierge-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    container_name: carmaconcierge-backend
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://carmaconcierge:devpassword@postgres:5432/carmaconcierge?schema=public
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
+      PORT: 3000
+      NODE_ENV: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./apps/backend:/app
+      - /app/node_modules
+    networks:
+      - carmaconcierge-network
+    command: pnpm dev
+
+  admin:
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+    container_name: carmaconcierge-admin
+    ports:
+      - "3001:3001"
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:3000
+      NODE_ENV: development
+    depends_on:
+      - backend
+    volumes:
+      - ./apps/admin:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - carmaconcierge-network
+    command: pnpm dev
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  carmaconcierge-network:
+    driver: bridge

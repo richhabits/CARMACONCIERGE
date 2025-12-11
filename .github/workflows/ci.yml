@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: testdb
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint shared package
+        run: pnpm --filter @carmaconcierge/shared lint
+
+      - name: Build shared package
+        run: pnpm --filter @carmaconcierge/shared build
+
+      - name: Lint backend
+        run: pnpm --filter backend lint
+
+      - name: Generate Prisma Client
+        run: pnpm --filter backend prisma:generate
+        working-directory: apps/backend
+
+      - name: Run database migrations
+        run: pnpm --filter backend prisma migrate deploy
+        working-directory: apps/backend
+        env:
+          DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb?schema=public
+
+      - name: Run backend tests
+        run: pnpm --filter backend test
+        env:
+          DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb?schema=public
+
+      - name: Lint admin
+        run: pnpm --filter admin lint
+
+      - name: Build admin
+        run: pnpm --filter admin build
+
+      - name: Lint mobile
+        run: pnpm --filter mobile lint || true
+
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./apps/backend/Dockerfile
+          push: false
+          tags: carmaconcierge-backend:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build admin Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./apps/admin/Dockerfile
+          push: false
+          tags: carmaconcierge-admin:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

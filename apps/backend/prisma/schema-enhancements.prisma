@@ -1,0 +1,270 @@
+// Schema enhancements for production features
+
+enum ReminderType {
+  MOT
+  SERVICE
+  INSURANCE
+  TAX
+  INSPECTION
+  CUSTOM
+}
+
+enum ReminderStatus {
+  ACTIVE
+  COMPLETED
+  DISMISSED
+  EXPIRED
+}
+
+enum ReminderPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum DiagnosticSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum ServiceLiveStatus {
+  WAITING
+  INSPECTION
+  WORK_IN_PROGRESS
+  TESTING
+  FINAL_CHECK
+  COMPLETE
+}
+
+enum OAuthProvider {
+  GOOGLE
+  MICROSOFT
+  APPLE
+  FACEBOOK
+}
+
+// Enhanced User Profile
+model UserProfile {
+  id                    String   @id @default(uuid())
+  userId                String   @unique
+  dateOfBirth           DateTime?
+  address               String?
+  city                  String?
+  postcode              String?
+  country               String   @default("UK")
+  driverLicenseNumber   String?
+  insuranceProvider     String?
+  insurancePolicyNumber String?
+  insuranceExpiry       DateTime?
+  taxDirectDebit        Boolean  @default(false)
+  preferredContactMethod String? // EMAIL, SMS, PUSH, CALL
+  notificationPreferences Json?  // JSON for granular preferences
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reminders             Reminder[]
+  diagnostics           VehicleDiagnostic[]
+  oauthConnections      OAuthConnection[]
+
+  @@map("user_profiles")
+}
+
+// Reminders System
+model Reminder {
+  id            String         @id @default(uuid())
+  userId        String
+  vehicleId     String?
+  type          ReminderType
+  title         String
+  description   String?
+  dueDate       DateTime
+  priority      ReminderPriority @default(MEDIUM)
+  status        ReminderStatus @default(ACTIVE)
+  isRecurring   Boolean        @default(false)
+  recurrenceRule String?       // RRULE format
+  notifiedAt    DateTime?
+  completedAt   DateTime?
+  dismissedAt   DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile       UserProfile    @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  vehicle       Vehicle?       @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([vehicleId])
+  @@index([dueDate])
+  @@index([status])
+  @@map("reminders")
+}
+
+// AI Mechanic Diagnostic System
+model VehicleDiagnostic {
+  id              String            @id @default(uuid())
+  userId          String
+  vehicleId       String
+  issue           String            // User-reported issue
+  symptoms        String[]
+  aiAnalysis      String            // AI-generated analysis
+  aiRecommendations String[]        // AI recommendations
+  severity        DiagnosticSeverity @default(INFO)
+  estimatedCost   Float?
+  estimatedTime   Int?              // minutes
+  commonProblems  Json?             // JSON array of common problems for this make/model
+  diagnosticCode  String?           // OBD code if applicable
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile         UserProfile       @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  vehicle         Vehicle           @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([vehicleId])
+  @@index([severity])
+  @@map("vehicle_diagnostics")
+}
+
+// Service Live Tracking
+model ServiceLiveTracking {
+  id              String            @id @default(uuid())
+  jobId           String            @unique
+  status          ServiceLiveStatus @default(WAITING)
+  currentStage    String?           // "Oil Change", "Brake Inspection", etc.
+  technicianName  String?
+  photos          String[]          // URLs to photos during service
+  videos          String[]          // URLs to video clips
+  notes           String?
+  startedAt       DateTime?
+  estimatedCompletion DateTime?
+  lastUpdate      DateTime          @default(now())
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  job             Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
+  @@index([status])
+  @@map("service_live_tracking")
+}
+
+// Video Call Sessions
+model VideoCallSession {
+  id              String   @id @default(uuid())
+  jobId           String?
+  conversationId  String?
+  userId          String
+  supplierId      String
+  provider        String   // "zoom", "google-meet", "teams", "custom"
+  meetingId       String
+  meetingUrl      String
+  startTime       DateTime?
+  endTime         DateTime?
+  duration        Int?     // seconds
+  recordingUrl    String?
+  status          String   @default("scheduled") // scheduled, active, ended, cancelled
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  supplier        Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  job             Job?     @relation(fields: [jobId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([supplierId])
+  @@index([jobId])
+  @@index([status])
+  @@map("video_call_sessions")
+}
+
+// OAuth Connections
+model OAuthConnection {
+  id              String       @id @default(uuid())
+  userId          String
+  provider        OAuthProvider
+  providerUserId  String       // User ID from provider
+  email           String?
+  accessToken     String       @encrypted // Encrypted token
+  refreshToken    String?      @encrypted
+  expiresAt       DateTime?
+  scope           String[]     // OAuth scopes granted
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile         UserProfile  @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@unique([userId, provider])
+  @@index([userId])
+  @@index([provider])
+  @@map("oauth_connections")
+}
+
+// Common Vehicle Problems Database
+model VehicleProblem {
+  id              String   @id @default(uuid())
+  make            String
+  model           String?
+  yearRange       String?  // "2015-2020"
+  problemTitle    String
+  problemDescription String
+  symptoms        String[]
+  commonCauses    String[]
+  severity        DiagnosticSeverity @default(WARNING)
+  estimatedCost   Float?
+  estimatedTime   Int?     // minutes
+  frequency       Int      @default(0) // How often this occurs
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([make, model])
+  @@index([severity])
+  @@map("vehicle_problems")
+}
+
+// Service History
+model ServiceHistory {
+  id              String   @id @default(uuid())
+  vehicleId       String
+  jobId           String?  // Link to job if applicable
+  serviceType     String   // "Oil Change", "Brake Service", etc.
+  serviceDate     DateTime
+  mileage         Int?
+  cost            Float?
+  garageName      String?
+  description     String?
+  nextServiceDue  DateTime?
+  partsUsed       Json?    // JSON array of parts
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  vehicle         Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId])
+  @@index([serviceDate])
+  @@map("service_history")
+}
+
+// Update existing models with new relations
+// Add to User model:
+//   profile        UserProfile?
+//   reminders      Reminder[]
+//   diagnostics    VehicleDiagnostic[]
+//   oauthConnections OAuthConnection[]
+//   videoCalls     VideoCallSession[]
+
+// Add to Vehicle model:
+//   reminders      Reminder[]
+//   diagnostics    VehicleDiagnostic[]
+//   serviceHistory ServiceHistory[]
+
+// Add to Job model:
+//   liveTracking   ServiceLiveTracking?
+//   videoCall      VideoCallSession?
+
+// Add to Supplier model:
+//   videoCalls     VideoCallSession[]

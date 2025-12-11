@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground: 0, 0, 0;
+  --background: 255, 255, 255;
+  --brand-black: #1d1d1f;
+  --brand-red: #c41e3a;
+  --brand-blue: #1e3a8a;
+  --gray-50: #fafafa;
+  --gray-100: #f5f5f7;
+  --gray-200: #e5e5e7;
+  --gray-300: #d2d2d7;
+  --gray-400: #a1a1a6;
+  --gray-500: #86868b;
+  --gray-600: #6e6e73;
+  --gray-700: #424245;
+  --gray-800: #1d1d1f;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: rgb(var(--foreground));
+  background: rgb(var(--background));
+  letter-spacing: -0.01em;
+  line-height: 1.47059;
+}
+
+/* Apple-like smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* UK Automotive button styles */
+.btn-primary {
+  @apply bg-uk-blue-500 text-white px-8 py-3.5 rounded-lg font-semibold text-base;
+  @apply hover:bg-uk-blue-600 active:scale-[0.98] transition-all duration-200;
+  @apply shadow-uk hover:shadow-uk-lg;
+}
+
+.btn-secondary {
+  @apply bg-white text-uk-dark px-8 py-3.5 rounded-lg font-semibold text-base;
+  @apply border-2 border-uk-blue-500 hover:bg-uk-blue-50 active:scale-[0.98] transition-all duration-200;
+  @apply shadow-uk hover:shadow-uk-lg;
+}
+
+/* UK Automotive input styles */
+.input-apple {
+  @apply w-full px-4 py-3.5 rounded-lg border-2 border-gray-300;
+  @apply focus:border-uk-blue-500 focus:ring-2 focus:ring-uk-blue-200;
+  @apply transition-all duration-200 outline-none;
+  @apply placeholder:text-gray-400 text-uk-dark;
+  @apply bg-white;
+}
+
+/* UK Automotive card styles */
+.card-apple {
+  @apply bg-white rounded-lg shadow-uk-lg border border-gray-100;
+  @apply hover:shadow-uk-xl transition-shadow duration-300;
+}
+
+/* UK-inspired subtle accent */
+.uk-accent-line {
+  position: relative;
+}
+
+.uk-accent-line::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    #1e3a8a 0%,
+    #1e3a8a 33.33%,
+    #c41e3a 33.33%,
+    #c41e3a 66.66%,
+    #1d1d1f 66.66%,
+    #1d1d1f 100%
+  );
+  border-radius: 2px 2px 0 0;
+}
+
+/* Refined typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* Smooth animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
