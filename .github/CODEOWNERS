@@ -1,0 +1,22 @@
+# Default owners for everything in the repo
+* @richhabits
+
+# Backend code
+/apps/backend/ @richhabits
+
+# Admin frontend
+/apps/admin/ @richhabits
+
+# Mobile app
+/apps/mobile/ @richhabits
+
+# Shared packages
+/packages/ @richhabits
+
+# Documentation
+*.md @richhabits
+
+# Configuration files
+package.json @richhabits
+pnpm-workspace.yaml @richhabits
+turbo.json @richhabits
