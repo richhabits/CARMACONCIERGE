@@ -16,6 +16,7 @@
     "mobile:dev": "pnpm --filter mobile dev",
     "backend:dev": "pnpm --filter backend dev",
     "admin:dev": "pnpm --filter admin dev",
+    "garage:dev": "pnpm --filter garage-pro dev",
     "verify": "./scripts/verify-setup.sh",
     "test:system": "./scripts/test-system.sh",
     "clean-start": "./scripts/clean-start.sh",
